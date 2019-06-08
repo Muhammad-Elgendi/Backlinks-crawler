@@ -1,5 +1,6 @@
 package backlinkscrawler.crawler;
 
+import backlinkscrawler.SampleLauncher;
 import backlinkscrawler.db.Backlink;
 import edu.uci.ics.crawler4j.crawler.Page;
 import edu.uci.ics.crawler4j.crawler.WebCrawler;
@@ -11,12 +12,7 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.slf4j.Logger;
-import backlinkscrawler.SampleLauncher;
-import backlinkscrawler.db.PostgresDBService;
-
-import java.io.UnsupportedEncodingException;
-import java.net.MalformedURLException;
-import java.net.URL;
+import java.io.*;
 import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.regex.Pattern;
@@ -35,13 +31,15 @@ public class PostgresWebCrawler extends WebCrawler {
             "|xml|txt|java|c|cpp|exe" +
             "))$");
 
-
-    private final PostgresDBService postgresDBService;
+//    private final PostgresDBService postgresDBService;
 
     private ArrayList<Backlink> buffer;
 
-    public PostgresWebCrawler(PostgresDBService postgresDBService) {
-        this.postgresDBService = postgresDBService;
+    private int filesCounter=0;
+
+//    public PostgresWebCrawler(PostgresDBService postgresDBService) {
+    public PostgresWebCrawler() {
+//        this.postgresDBService = postgresDBService;
         buffer = new ArrayList();
     }
 
@@ -139,14 +137,17 @@ public class PostgresWebCrawler extends WebCrawler {
         }
 
         // persisting in-memory data
-        if (buffer.size() >= 900){
-            logger.info("--- Persisting in-memory data: "+ buffer.size());
-            try {
-                postgresDBService.storeBacklinks(buffer);
+        if (buffer.size() >= 1000){
+            logger.info("Persisting in-memory data: "+ buffer.size());
+//            try {
+//                postgresDBService.storeBacklinks(buffer);
+                filesCounter++;
+                Thread thread = new BacklinksFlusher(buffer,this.myId,filesCounter);
+                thread.start();
                 buffer = new ArrayList<Backlink>();
-            } catch (RuntimeException e) {
-                logger.error("Storing backlinks failed", e);
-            }
+//            } catch (RuntimeException e) {
+//                logger.error("Storing backlinks failed", e);
+//            }
         }
     }
 
@@ -160,8 +161,40 @@ public class PostgresWebCrawler extends WebCrawler {
 //            postgresDBService.close();
 //        }
 //    }
+}
 
+class BacklinksFlusher extends Thread {
+    private static final Logger logger = org.slf4j.LoggerFactory.getLogger(BacklinksFlusher.class);
+    private ArrayList<Backlink> backlinks;
+    private int counter;
+    private int threadId;
+    public BacklinksFlusher(ArrayList<Backlink> backlinks,int threadId,int counter) {
+        this.counter = counter;
+        this.backlinks = backlinks;
+        this.threadId = threadId;
+    }
 
+    public void run() {
+        File target = new File(SampleLauncher.backlinksStorePath+"/"+threadId+"-"+counter);
+        try {
+            target.createNewFile();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        PrintWriter printWriter = null;
+        try {
+            printWriter = new PrintWriter(target);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+        for (Backlink backlink : backlinks) {
 
+            printWriter.println(backlink.getSourceUrl()+"#|#"+backlink.getTargetUrl()+"#|#"+backlink.getAnchorText()+"#|#"+backlink.getDoFollow());
+            printWriter.println("-#|#-");
+
+        }
+        printWriter.close();
+    }
 
 }
+

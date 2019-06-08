@@ -6,16 +6,17 @@ import backlinkscrawler.db.impl.PostgresDBServiceImpl;
 
 public class PostgresCrawlerFactory implements CrawlController.WebCrawlerFactory<PostgresWebCrawler> {
 
-    private ComboPooledDataSource comboPooledDataSource;
+//    private ComboPooledDataSource comboPooledDataSource;
 
-    public PostgresCrawlerFactory(ComboPooledDataSource comboPooledDataSource) {
-
-        this.comboPooledDataSource = comboPooledDataSource;
+//    public PostgresCrawlerFactory(ComboPooledDataSource comboPooledDataSource) {
+    public PostgresCrawlerFactory() {
+//        this.comboPooledDataSource = comboPooledDataSource;
 
     }
 
     public PostgresWebCrawler newInstance() throws Exception {
-        return new PostgresWebCrawler(new PostgresDBServiceImpl(comboPooledDataSource));
+//        return new PostgresWebCrawler(new PostgresDBServiceImpl(comboPooledDataSource));
+        return new PostgresWebCrawler();
     }
 
 }

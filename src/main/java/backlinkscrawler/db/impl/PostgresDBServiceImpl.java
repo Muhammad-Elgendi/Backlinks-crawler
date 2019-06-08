@@ -56,7 +56,7 @@ public class PostgresDBServiceImpl implements PostgresDBService {
 
     @Override
     public void storeBacklinks(ArrayList<Backlink> backlinks) {
-        final int batchSize = 1000;
+        final int batchSize = 300;
         int count = 0;
         try {
             insertBacklinkStatement = comboPooledDataSource.getConnection().prepareStatement("insert into backlinks values " +

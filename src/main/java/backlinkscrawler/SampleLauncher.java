@@ -13,11 +13,20 @@ import io.github.cdimascio.dotenv.Dotenv;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import backlinkscrawler.crawler.PostgresCrawlerFactory;
+
+import java.io.File;
 import java.net.URL;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Scanner;
 
 public class SampleLauncher {
 
     private static final Logger logger = LoggerFactory.getLogger(SampleLauncher.class);
+
+    public static String backlinksStorePath ;
 
 //    public static  String mainUrl;
 //    public static Integer userId;
@@ -51,7 +60,9 @@ public class SampleLauncher {
 //        userId = 1;
 //        siteId = 2;
 //        int maxPages = 10000;
-        int numberOfCrawlers = 40;
+//        with 30 threads 20/s
+        int numberOfCrawlers = 30;
+        boolean resume = true;
 //        exactMatch = false;
 
 
@@ -70,6 +81,16 @@ public class SampleLauncher {
 
         config.setRedisHost(dotenv.get("REDIS_HOST"));
         config.setRedisPort(Integer.valueOf(dotenv.get("REDIS_PORT")));
+
+        backlinksStorePath = dotenv.get("BACKLINKS_PATH");
+        File backlinksDir = new File(backlinksStorePath);
+        if( backlinksDir.exists() ){
+            backlinksStorePath +="-"+new SimpleDateFormat("yyyy-MMMM-dd__HH-mm-ss").format(new Date());
+            File newDir = new File(backlinksStorePath);
+            newDir.mkdir();
+        }else{
+            backlinksDir.mkdir();
+        }
 
         config.setPolitenessDelay(100);
 
@@ -92,7 +113,7 @@ public class SampleLauncher {
          * example: the contents of pdf, or the metadata of images etc
          */
         config.setIncludeBinaryContentInCrawling(false);
-
+//        config.setMaxDownloadSize();
         /*
          * Do you need to set a proxy? If so, you can use:
          * config.setProxyHost("proxyserver.example.com");
@@ -109,7 +130,7 @@ public class SampleLauncher {
          * want to start a fresh crawl, you need to delete the contents of
          * rootFolder manually.
          */
-        config.setResumableCrawling(false);
+        config.setResumableCrawling(resume);
 
 //        config.setRespectNoFollow(false);
 
@@ -123,6 +144,7 @@ public class SampleLauncher {
         RobotstxtConfig robotstxtConfig = new RobotstxtConfig();
 
         robotstxtConfig.setUserAgentName("SEO-spider");
+        robotstxtConfig.setEnabled(false);
 
         PageFetcher pageFetcher = new PageFetcher(config);
         RobotstxtServer robotstxtServer = new RobotstxtServer(robotstxtConfig, pageFetcher);
@@ -133,17 +155,26 @@ public class SampleLauncher {
          * URLs that are fetched and then the crawler starts following links
          * which are found in these pages
          */
-        controller.addSeed("https://en.wikipedia.org/");
+        /*
+         * Read seeds from topSites.csv file
+         */
 
+        if(!resume) {
+            logger.info("Seeding frontier ...");
+            Scanner scanner = new Scanner(new File("./topSites.csv"));
+            while (scanner.hasNextLine()) {
+                controller.addSeed("http://" + scanner.nextLine());
+//            controller.addSeed("https://"+scanner.nextLine());
+            }
+        }
 
-
-        ComboPooledDataSource comboPooledDataSource = new ComboPooledDataSource();
-        comboPooledDataSource.setDriverClass("org.postgresql.Driver");
-        comboPooledDataSource.setJdbcUrl(dotenv.get("JDBC_URL"));
-        comboPooledDataSource.setUser(dotenv.get("DB_USER_NAME"));
-        comboPooledDataSource.setPassword(dotenv.get("DB_PASSWORD"));
-        comboPooledDataSource.setMaxPoolSize(numberOfCrawlers);
-        comboPooledDataSource.setMinPoolSize(numberOfCrawlers);
+//        ComboPooledDataSource comboPooledDataSource = new ComboPooledDataSource();
+//        comboPooledDataSource.setDriverClass("org.postgresql.Driver");
+//        comboPooledDataSource.setJdbcUrl(dotenv.get("JDBC_URL"));
+//        comboPooledDataSource.setUser(dotenv.get("DB_USER_NAME"));
+//        comboPooledDataSource.setPassword(dotenv.get("DB_PASSWORD"));
+//        comboPooledDataSource.setMaxPoolSize(numberOfCrawlers);
+//        comboPooledDataSource.setMinPoolSize(numberOfCrawlers);
 
 
         logger.info("Starting Crawling Process ... ");
@@ -153,14 +184,15 @@ public class SampleLauncher {
          * will reach the line after this only when crawling is finished.
          */
 
-        controller.start(new PostgresCrawlerFactory(comboPooledDataSource), numberOfCrawlers);
+//        controller.start(new PostgresCrawlerFactory(comboPooledDataSource), numberOfCrawlers);
+        controller.start(new PostgresCrawlerFactory(), numberOfCrawlers);
 
 
         logger.info("Crawling Process Has Finished ... ");
 
 
 
-        comboPooledDataSource.close();
+//        comboPooledDataSource.close();
 
         logger.info("Connection Pool Has Closed ... ");
 
@@ -173,5 +205,16 @@ public class SampleLauncher {
         return new java.sql.Timestamp(new java.util.Date().getTime());
 
     }
+
+//    private static List<String> getRecordFromLine(String line) {
+//        List<String> values = new ArrayList<String>();
+//        try (Scanner rowScanner = new Scanner(line)) {
+//            rowScanner.useDelimiter(",");
+//            while (rowScanner.hasNext()) {
+//                values.add(rowScanner.next());
+//            }
+//        }
+//        return values;
+//    }
 
 }
