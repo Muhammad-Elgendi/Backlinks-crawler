@@ -87,11 +87,9 @@ public class PostgresWebCrawler extends WebCrawler {
             boolean isFollow = true;
             for (Header header : headers) {
                 if (header.getName().equals("X-Robots-Tag")) {
-                    if (header.getValue().contains("nofollow")) {
+                    if (header.getValue().contains("nofollow") || header.getValue().contains("none")) {
                         isFollow = false;
-                    }
-                    if (header.getValue().contains("none")) {
-                        isFollow = false;
+                        break;
                     }
                 }
             }
@@ -100,6 +98,7 @@ public class PostgresWebCrawler extends WebCrawler {
                 for (Element tag : robotsTags) {
                     if (tag.attr("content").contains("nofollow")) {
                         isFollow = false;
+                        break;
                     }
                 }
             }
@@ -134,11 +133,9 @@ public class PostgresWebCrawler extends WebCrawler {
                 }
             }
 
-        }
-
-        // persisting in-memory data
-        if (buffer.size() >= 1000){
-            logger.info("Persisting in-memory data: "+ buffer.size());
+            // persisting in-memory data
+            if (buffer.size() >= 1000){
+                logger.info("Persisting in-memory data: "+ buffer.size());
 //            try {
 //                postgresDBService.storeBacklinks(buffer);
                 filesCounter++;
@@ -148,6 +145,7 @@ public class PostgresWebCrawler extends WebCrawler {
 //            } catch (RuntimeException e) {
 //                logger.error("Storing backlinks failed", e);
 //            }
+            }
         }
     }
 

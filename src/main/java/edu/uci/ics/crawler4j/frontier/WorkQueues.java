@@ -53,6 +53,9 @@ public class WorkQueues {
 			Set<String> zrange = urlsDB.zrange(ALL_URLS, 0, max);
 			for (String s : zrange) {
 				Map<String, String> hmap = urlsDB.hgetAll(s);
+				if (hmap.size() == 0){
+					continue;
+				}
 				WebURL webURL = webURLBinding.entryToObject(hmap);
 				results.add(webURL);
 			}

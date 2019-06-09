@@ -14,6 +14,7 @@ import org.slf4j.Logger;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.net.*;
 import java.util.List;
 import java.util.Scanner;
@@ -26,11 +27,15 @@ public class seedHtmlMaker {
          */
 
         Scanner scanner = new Scanner(new File("./topSites.csv"));
+        File html = new File("./top-sites.html");
+        PrintWriter writer =new PrintWriter(html);
+        writer.println("<HTML><HEAD><TITLE>Top Sites</TITLE></HEAD><BODY>");
         while (scanner.hasNextLine()) {
-            Thread thread = new SeedConnector("http://"+scanner.nextLine());
-
-            thread.start();
+//            Thread thread = new SeedConnector("http://"+scanner.nextLine());//
+//            thread.start();
+            writer.println("<a href=\""+"http://"+scanner.nextLine()+"\">0</a>");
         }
+        writer.println("</BODY></HTML>");
 
     }
 

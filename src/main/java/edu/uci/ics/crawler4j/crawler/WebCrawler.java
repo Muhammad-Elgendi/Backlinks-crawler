@@ -221,7 +221,7 @@ public class WebCrawler implements Runnable {
   protected void onUnhandledException(WebURL webUrl, Throwable e) {
     String urlStr = (webUrl == null ? "NULL" : webUrl.getURL());
     logger.warn("Unhandled exception while fetching {}: {}", urlStr, e.getMessage());
-    logger.info("Stacktrace: ", e);
+//    logger.info("Stacktrace: ", e);
     // Do nothing by default (except basic logging)
     // Sub-classed can override this to add their custom functionality
   }
@@ -254,9 +254,9 @@ public class WebCrawler implements Runnable {
   public void run() {
     onStart();
     while (true) {
-      List<WebURL> assignedURLs = new ArrayList<>(50);
+      List<WebURL> assignedURLs = new ArrayList<>(1000);
       isWaitingForNewURLs = true;
-      frontier.getNextURLs(50, assignedURLs);
+      frontier.getNextURLs(2000, assignedURLs);
       isWaitingForNewURLs = false;
       if (assignedURLs.isEmpty()) {
         if (frontier.isFinished()) {

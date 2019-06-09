@@ -1,9 +1,5 @@
 package backlinkscrawler;
 
-
-import com.github.s3curitybug.similarityuniformfuzzyhash.UniformFuzzyHash;
-import com.github.s3curitybug.similarityuniformfuzzyhash.UniformFuzzyHashes;
-import com.mchange.v2.c3p0.ComboPooledDataSource;
 import edu.uci.ics.crawler4j.crawler.CrawlConfig;
 import edu.uci.ics.crawler4j.crawler.CrawlController;
 import edu.uci.ics.crawler4j.fetcher.PageFetcher;
@@ -15,11 +11,8 @@ import org.slf4j.LoggerFactory;
 import backlinkscrawler.crawler.PostgresCrawlerFactory;
 
 import java.io.File;
-import java.net.URL;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 import java.util.Scanner;
 
 public class SampleLauncher {
@@ -61,7 +54,7 @@ public class SampleLauncher {
 //        siteId = 2;
 //        int maxPages = 10000;
 //        with 30 threads 20/s
-        int numberOfCrawlers = 30;
+        int numberOfCrawlers = 40;
         boolean resume = true;
 //        exactMatch = false;
 
@@ -159,7 +152,7 @@ public class SampleLauncher {
          * Read seeds from topSites.csv file
          */
 
-        if(!resume) {
+        if(!config.isResumableCrawling()) {
             logger.info("Seeding frontier ...");
             Scanner scanner = new Scanner(new File("./topSites.csv"));
             while (scanner.hasNextLine()) {

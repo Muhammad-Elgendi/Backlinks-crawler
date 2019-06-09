@@ -71,18 +71,18 @@
             <version>1.7.22</version>
         </dependency>
 
-        <dependency>
-            <groupId>log4j</groupId>
-            <artifactId>log4j</artifactId>
-            <version>1.2.16</version>
-            <scope>runtime</scope>
-        </dependency>
+        <!--<dependency>-->
+            <!--<groupId>log4j</groupId>-->
+            <!--<artifactId>log4j</artifactId>-->
+            <!--<version>1.2.16</version>-->
+            <!--<scope>runtime</scope>-->
+        <!--</dependency>-->
 
-        <dependency>
-            <groupId>com.github.s3curitybug</groupId>
-            <artifactId>similarity-uniform-fuzzy-hash</artifactId>
-            <version>LATEST</version>
-        </dependency>
+        <!--<dependency>-->
+            <!--<groupId>com.github.s3curitybug</groupId>-->
+            <!--<artifactId>similarity-uniform-fuzzy-hash</artifactId>-->
+            <!--<version>LATEST</version>-->
+        <!--</dependency>-->
 
         <dependency>
             <groupId>org.jsoup</groupId>
@@ -110,12 +110,12 @@
 
 
         <!-- Compile time Dependencies -->
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-api</artifactId>
-            <version>1.7.10</version>
-            <scope>compile</scope>
-        </dependency>
+        <!--<dependency>-->
+            <!--<groupId>org.slf4j</groupId>-->
+            <!--<artifactId>slf4j-api</artifactId>-->
+            <!--<version>1.7.10</version>-->
+            <!--<scope>compile</scope>-->
+        <!--</dependency>-->
 
         <dependency>
             <groupId>uk.org.lidalia</groupId>
@@ -137,11 +137,19 @@
             <scope>compile</scope>
         </dependency>
 
+        <!--<dependency>-->
+            <!--<groupId>redis.clients</groupId>-->
+            <!--<artifactId>jedis</artifactId>-->
+            <!--<version>2.8.0</version>-->
+        <!--</dependency>-->
+
+        <!-- https://mvnrepository.com/artifact/redis.clients/jedis -->
         <dependency>
             <groupId>redis.clients</groupId>
             <artifactId>jedis</artifactId>
-            <version>2.8.0</version>
+            <version>3.0.1</version>
         </dependency>
+
         <dependency>
             <groupId>org.apache.tika</groupId>
             <artifactId>tika-parsers</artifactId>
